@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1a1a1a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Cardio Plan">
+<link rel="manifest" href="manifest.json">
+<title>6-week cardio plan</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f0; color: #1a1a1a; font-size: 15px; padding-bottom: 2rem; }
+  .header { background: #fff; border-bottom: 0.5px solid #e0e0da; padding: 16px; position: sticky; top: 0; z-index: 10; }
+  .header h1 { font-size: 17px; font-weight: 600; }
+  .header p { font-size: 12px; color: #888; margin-top: 2px; }
+  .metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 12px 16px; }
+  .mc { background: #fff; border-radius: 10px; padding: 12px; border: 0.5px solid #e8e8e2; }
+  .mc-label { font-size: 11px; color: #888; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .mc-val { font-size: 18px; font-weight: 600; }
+  .zone-section { padding: 0 16px 8px; }
+  .zone-title { font-size: 13px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  .zones { display: flex; flex-direction: column; gap: 6px; }
+  .zone { border-radius: 10px; padding: 10px 12px; border: 0.5px solid; }
+  .zone-liss { background: #E1F5EE; border-color: #9FE1CB; }
+  .zone-tempo { background: #EEEDFE; border-color: #CECBF6; }
+  .zone-hiit { background: #FAECE7; border-color: #F5C4B3; }
+  .zone-name { font-size: 12px; font-weight: 600; margin-bottom: 2px; }
+  .zone-liss .zone-name { color: #085041; }
+  .zone-tempo .zone-name { color: #3C3489; }
+  .zone-hiit .zone-name { color: #993C1D; }
+  .zone-speed { font-size: 16px; font-weight: 700; }
+  .zone-liss .zone-speed { color: #085041; }
+  .zone-tempo .zone-speed { color: #3C3489; }
+  .zone-hiit .zone-speed { color: #993C1D; }
+  .zone-sub { font-size: 11px; color: #555; margin-top: 2px; }
+  .week-tabs { display: flex; gap: 6px; padding: 12px 16px 8px; overflow-x: auto; scrollbar-width: none; }
+  .week-tabs::-webkit-scrollbar { display: none; }
+  .wtab { padding: 7px 14px; font-size: 13px; border: 0.5px solid #ccc; border-radius: 20px; background: #fff; color: #666; cursor: pointer; white-space: nowrap; font-family: inherit; -webkit-tap-highlight-color: transparent; }
+  .wtab.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; font-weight: 500; }
+  .week-desc { margin: 0 16px 10px; font-size: 13px; color: #555; line-height: 1.6; background: #fff; border-radius: 10px; padding: 10px 12px; border-left: 3px solid #ccc; }
+  .sessions { display: flex; flex-direction: column; gap: 8px; padding: 0 16px; }
+  .session { background: #fff; border-radius: 12px; border: 0.5px solid #e8e8e2; overflow: hidden; }
+  .session-head { display: flex; justify-content: space-between; align-items: flex-start; padding: 12px 14px 10px; }
+  .s-day { font-size: 10px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+  .s-name { font-size: 14px; font-weight: 600; line-height: 1.3; }
+  .s-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; margin-left: 8px; }
+  .s-dur { font-size: 13px; font-weight: 600; }
+  .s-tag { font-size: 10px; padding: 3px 8px; border-radius: 6px; font-weight: 600; white-space: nowrap; }
+  .tag-hiit { background: #FAECE7; color: #993C1D; }
+  .tag-liss { background: #E1F5EE; color: #085041; }
+  .tag-tempo { background: #EEEDFE; color: #3C3489; }
+  .tag-rest { background: #f0f0ea; color: #666; }
+  .intervals { border-top: 0.5px solid #eee; }
+  .interval-header { display: grid; grid-template-columns: 1fr 72px 62px 58px; gap: 4px; padding: 6px 14px; font-size: 10px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.04em; background: #fafaf8; }
+  .interval-row { display: grid; grid-template-columns: 1fr 72px 62px 58px; gap: 4px; padding: 7px 14px; font-size: 12px; border-top: 0.5px solid #f0f0ea; align-items: center; }
+  .interval-row.warmup { background: #fafaf8; }
+  .interval-row.work { background: #FAECE7; }
+  .interval-row.recovery { background: #E1F5EE; }
+  .interval-row.cooldown { background: #fafaf8; }
+  .interval-row.steady { background: #fafaf8; }
+  .iv-label { font-weight: 500; color: #1a1a1a; }
+  .interval-row.work .iv-label { color: #712B13; }
+  .interval-row.recovery .iv-label { color: #085041; }
+  .spec { font-weight: 600; text-align: center; color: #1a1a1a; }
+  .interval-row.work .spec { color: #712B13; }
+  .interval-row.recovery .spec { color: #085041; }
+  .footer { padding: 20px 16px 0; font-size: 12px; color: #888; line-height: 1.6; text-align: center; }
+  #install-banner { display: none; align-items: center; justify-content: space-between; background: #1a1a1a; color: #fff; padding: 12px 16px; font-size: 13px; gap: 12px; }
+  #install-banner button { background: #fff; color: #1a1a1a; border: none; border-radius: 8px; padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  #install-banner .dismiss { background: transparent; color: #aaa; font-size: 20px; padding: 0 4px; font-weight: 300; }
+</style>
+</head>
+<body>
+
+<div id="install-banner">
+  <span>Add this plan to your home screen</span>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button id="install-btn">Install</button>
+    <button class="dismiss" id="dismiss-btn">×</button>
+  </div>
+</div>
+
+<div class="header">
+  <h1>6-week cardio plan</h1>
+  <p>82 kg · 176 cm · Age 26 · Fat loss focus</p>
+</div>
+
+<div class="metrics">
+  <div class="mc"><div class="mc-label">Start weight</div><div class="mc-val">82 kg</div></div>
+  <div class="mc"><div class="mc-label">Target</div><div class="mc-val">~76 kg</div></div>
+  <div class="mc"><div class="mc-label">Max HR</div><div class="mc-val">194 bpm</div></div>
+  <div class="mc"><div class="mc-label">Sessions/wk</div><div class="mc-val">5 days</div></div>
+</div>
+
+<div class="zone-section">
+  <div class="zone-title">Heart rate zones</div>
+  <div class="zones">
+    <div class="zone zone-liss">
+      <div class="zone-name">Zone 2 — LISS (fat burn)</div>
+      <div class="zone-speed">5.5–7.0 km/h · Incline 1.5–2.0%</div>
+      <div class="zone-sub">116–135 bpm · conversational pace</div>
+    </div>
+    <div class="zone zone-tempo">
+      <div class="zone-name">Zone 3 — Tempo</div>
+      <div class="zone-speed">7.5–9.0 km/h · Incline 1.0%</div>
+      <div class="zone-sub">136–155 bpm · comfortably hard</div>
+    </div>
+    <div class="zone zone-hiit">
+      <div class="zone-name">Zone 4 — HIIT</div>
+      <div class="zone-speed">10.0–13.0 km/h · Incline 0.5–1.0%</div>
+      <div class="zone-sub">156–175 bpm · max effort intervals</div>
+    </div>
+  </div>
+</div>
+
+<div class="week-tabs" id="week-tabs">
+  <button class="wtab active" onclick="showWeek(1,this)">Week 1</button>
+  <button class="wtab" onclick="showWeek(2,this)">Week 2</button>
+  <button class="wtab" onclick="showWeek(3,this)">Week 3</button>
+  <button class="wtab" onclick="showWeek(4,this)">Week 4</button>
+  <button class="wtab" onclick="showWeek(5,this)">Week 5</button>
+  <button class="wtab" onclick="showWeek(6,this)">Week 6</button>
+</div>
+
+<div id="week-content"></div>
+<div class="footer">Weigh in once a week · Sleep 7–8 hrs · Drink 3L+ water daily</div>
+
+<script>
+const weeks = {
+  1: {
+    desc: "Week 1 — foundation. Keep everything easy. If jogging feels too hard, power-walk at 5.5 km/h on 2.0% incline.",
+    days: [
+      { day:"Monday", name:"LISS — brisk walk / light jog", dur:"30 min", type:"liss", intervals:[{label:"Entire session", phase:"steady", speed:"5.5–6.0", incline:"2.0%", time:"30 min"}]},
+      { day:"Tuesday", name:"Rest", dur:"Rest", type:"rest", intervals:[] },
+      { day:"Wednesday", name:"HIIT intro", dur:"25 min", type:"hiit", intervals:[
+          {label:"Warm-up", phase:"warmup", speed:"5.5", incline:"1.0%", time:"5 min"},
+          {label:"Work ×6", phase:"work", speed:"10.0", incline:"0.5%", time:"30 s each"},
+          {label:"Recovery ×6", phase:"recovery", speed:"5.5", incline:"0.5%", time:"90 s each"},
+          {label:"Cool-down", phase:"cooldown", speed:"4.5", incline:"0.0%", time:"5 min"}]},
+      { day:"Thursday", name:"LISS — cycle / elliptical", dur:"30 min", type:"liss", intervals:[{label:"Entire session", phase:"steady", speed:"5.5–6.0", incline:"1.5%", time:"30 min"}]},
+      { day:"Friday", name:"Rest", dur:"Rest", type:"rest", intervals:[] },
+      { day:"Saturday", name:"Tempo run", dur:"30 min", type:"tempo", intervals:[
+          {label:"Warm-up", phase:"warmup", speed:"5.5", incline:"1.0%", time:"5 min"},
+          {label:"Tempo block", phase:"work", speed:"7.5", incline:"1.0%", time:"20 min"},
+          {label:"Cool-down", phase:"cooldown", speed:"5.0", incline:"0.0%", time:"5 min"}]},
+      { day:"Sunday", name:"LISS — easy walk", dur:"30 min", type:"liss", intervals:[{label:"Entire session", phase:"steady", speed:"5.5", incline:"2.0%", time:"30 min"}]},
+    ]
+  },
+  2: {
+    desc: "Week 2 — add 5 min to LISS, one extra HIIT interval. Try to jog more of the LISS sessions.",
+    days: [
+      { day:"Monday", name:"LISS — jog", dur:"35 min", type:"liss", intervals:[{label:"Entire session", phase:"steady", speed:"6.0–6.5", incline:"1.5%", time:"35 min"}]},
+      { day:"Tuesday", name:"Rest", dur:"Rest", type:"rest", intervals:[] },
+      { day:"Wednesday", name:"HIIT", dur:"30 min", type:"hiit", intervals:[
+          {label:"Warm-up", phase:"warmup", speed:"5.5", incline:"1.0%", time:"5 min"},
+          {label:"Work ×8", phase:"work", speed:"10.5", incline:"0.5%", time:"30 s each"},
+          {label:"Recovery ×8", phase:"recovery", speed:"5.5", incline:"0.5%", time:"90 s each"},
+          {label:"Cool-down", phase:"cooldown", speed:"4.5", incline:"0.0%", time:"5 min"}]},
+      { day:"Thursday", name:"LISS — elliptical / cycle", dur:"35 min", type:"liss", intervals:[{label:"Entire session", phase:"steady", speed:"6.0", incline:"1.5%", time:"35 min"}]},
+      { day:"Friday", name:"Rest", dur:"Rest", type:"rest", intervals:[] },
+      { day:"Saturday", name:"Tempo run", dur:"35 min", type:"tempo", intervals:[
+          {label:"Warm-up", phase:"warmup", speed:"5.5", incline:"1.0%", time:"5 min"},
+          {label:"Tempo block", phase:"work", speed:"8.0", incline:"1.0%", time:"25 min"},
+          {label:"Cool-down", phase:"cooldown", speed:"5.0", incline:"0.0%", time:"5 min"}]},
+      { day:"Sunday", name:"LISS — easy walk/cycle", dur:"30 min", type:"liss", intervals:[{label:"Entire session", phase:"steady", speed:"5.5", incline:"2.0%", time:"30 min"}]},
+    ]
+  },
+  3: {
+    desc: "Week 3 — HIIT intervals go to 40 s. Tempo pace increases. You should feel a real improvement in breathing.",
+    days: [
+      { day:"Monday", name:"LISS — jog", dur:"40 min", type:"liss", intervals:[{label:"Entire session", phase:"steady", speed:"6.0–6.5", incline:"1.5%", time:"40 min"}]},
+      { day:"Tuesday", name:"Rest", dur:"Rest", type:"rest", intervals:[] },
+      { day:"Wednesday", name:"HIIT", dur:"30 min", type:"hiit", intervals:[
+          {label:"Warm-up", phase:"warmup", speed:"5.5", incline:"1.0%", time:"5 min"},
+          {label:"Work ×8", phase:"work", speed:"11.0", incline:"0.5%", time:"40 s each"},
+          {label:"Recovery ×8", phase:"recovery", speed:"5.5", incline:"0.5%", time:"80 s each"},
+          {label:"Cool-down", phase:"cooldown", speed:"4.5", incline:"0.0%", time:"5 min"}]},
+      { day:"Thursday", name:"LISS — rowing / cycle", dur:"35 min", type:"liss", intervals:[{label:"Entire session", phase:"steady", speed:"6.5", incline:"1.5%", time:"35 min"}]},
+      { day:"Friday", name:"Rest", dur:"Rest", type:"rest", intervals:[] },
+      { day:"Saturday", name:"Tempo run", dur:"40 min", type:"tempo", intervals:[
+          {label:"Warm-up", phase:"warmup", speed:"5.5", incline:"1.0%", time:"5 min"},
+          {label:"Tempo block", phase:"work", speed:"8.0–8.5", incline:"1.0%", time:"30 min"},
+          {label:"Cool-down", phase:"cooldown", speed:"5.0", incline:"0.0%", time:"5 min"}]},
+      { day:"Sunday", name:"LISS — easy walk", dur:"30 min", type:"liss", intervals:[{label:"Entire session", phase:"steady", speed:"5.5", incline:"2.0%", time:"30 min"}]},
+    ]
+  },
+  4: {
+    desc: "Week 4 — 10 HIIT intervals, longer tempo. Fatigue mid-week is normal. Prioritise sleep and protein.",
+    days: [
+      { day:"Monday", name:"LISS — continuous jog", dur:"40 min", type:"liss", intervals:[{label:"Entire session", phase:"steady", speed:"6.5–7.0", incline:"1.5%", time:"40 min"}]},
+      { day:"Tuesday", name:"Rest", dur:"Rest", type:"rest", intervals:[] },
+      { day:"Wednesday", name:"HIIT", dur:"35 min", type:"hiit", intervals:[
+          {label:"Warm-up", phase:"warmup", speed:"6.0", incline:"1.0%", time:"5 min"},
+          {label:"Work ×10", phase:"work", speed:"11.5", incline:"1.0%", time:"40 s each"},
+          {label:"Recovery ×10", phase:"recovery", speed:"5.5", incline:"0.5%", time:"80 s each"},
+          {label:"Cool-down", phase:"cooldown", speed:"4.5", incline:"0.0%", time:"5 min"}]},
+      { day:"Thursday", name:"LISS — stairmaster / elliptical", dur:"40 min", type:"liss", intervals:[{label:"Entire session", phase:"steady", speed:"6.5", incline:"2.0%", time:"40 min"}]},
+      { day:"Friday", name:"Rest", dur:"Rest", type:"rest", intervals:[] },
+      { day:"Saturday", name:"Tempo run — longer", dur:"45 min", type:"tempo", intervals:[
+          {label:"Warm-up", phase:"warmup", speed:"6.0", incline:"1.0%", time:"5 min"},
+          {label:"Tempo block", phase:"work", speed:"8.5", incline:"1.0%", time:"35 min"},
+          {label:"Cool-down", phase:"cooldown", speed:"5.0", incline:"0.0%", time:"5 min"}]},
+      { day:"Sunday", name:"LISS — easy walk", dur:"30 min", type:"liss", intervals:[{label:"Entire session", phase:"steady", speed:"5.5", incline:"1.5%", time:"30 min"}]},
+    ]
+  },
+  5: {
+    desc: "Week 5 — peak endurance building. HIIT goes to 45 s on / 60 s off. Zone 2 jog should feel manageable now.",
+    days: [
+      { day:"Monday", name:"LISS — jog", dur:"45 min", type:"liss", intervals:[{label:"Entire session", phase:"steady", speed:"7.0", incline:"1.5%", time:"45 min"}]},
+      { day:"Tuesday", name:"Rest", dur:"Rest", type:"rest", intervals:[] },
+      { day:"Wednesday", name:"HIIT — sprint intervals", dur:"35 min", type:"hiit", intervals:[
+          {label:"Warm-up", phase:"warmup", speed:"6.0", incline:"1.0%", time:"5 min"},
+          {label:"Work ×10", phase:"work", speed:"12.0", incline:"1.0%", time:"45 s each"},
+          {label:"Recovery ×10", phase:"recovery", speed:"5.5", incline:"0.5%", time:"60 s each"},
+          {label:"Cool-down", phase:"cooldown", speed:"4.5", incline:"0.0%", time:"5 min"}]},
+      { day:"Thursday", name:"LISS — rowing / cycle", dur:"40 min", type:"liss", intervals:[{label:"Entire session", phase:"steady", speed:"7.0", incline:"1.5%", time:"40 min"}]},
+      { day:"Friday", name:"Rest", dur:"Rest", type:"rest", intervals:[] },
+      { day:"Saturday", name:"Tempo run", dur:"48 min", type:"tempo", intervals:[
+          {label:"Warm-up", phase:"warmup", speed:"6.0", incline:"1.0%", time:"5 min"},
+          {label:"Tempo block", phase:"work", speed:"8.5–9.0", incline:"1.0%", time:"38 min"},
+          {label:"Cool-down", phase:"cooldown", speed:"5.0", incline:"0.0%", time:"5 min"}]},
+      { day:"Sunday", name:"LISS — long walk", dur:"60 min", type:"liss", intervals:[{label:"Entire session", phase:"steady", speed:"5.5–6.0", incline:"2.0%", time:"60 min"}]},
+    ]
+  },
+  6: {
+    desc: "Week 6 — finish strong. 12 HIIT intervals, longest tempo, highest LISS speed. Give it everything.",
+    days: [
+      { day:"Monday", name:"LISS — strong jog", dur:"50 min", type:"liss", intervals:[{label:"Entire session", phase:"steady", speed:"7.0–7.5", incline:"1.5%", time:"50 min"}]},
+      { day:"Tuesday", name:"Rest", dur:"Rest", type:"rest", intervals:[] },
+      { day:"Wednesday", name:"HIIT — max effort", dur:"40 min", type:"hiit", intervals:[
+          {label:"Warm-up", phase:"warmup", speed:"6.0", incline:"1.0%", time:"5 min"},
+          {label:"Work ×12", phase:"work", speed:"12.5–13.0", incline:"1.0%", time:"45 s each"},
+          {label:"Recovery ×12", phase:"recovery", speed:"5.5", incline:"0.5%", time:"60 s each"},
+          {label:"Cool-down", phase:"cooldown", speed:"4.5", incline:"0.0%", time:"5 min"}]},
+      { day:"Thursday", name:"LISS — incline walk / stairmaster", dur:"45 min", type:"liss", intervals:[{label:"Entire session", phase:"steady", speed:"6.0–6.5", incline:"3.0%", time:"45 min"}]},
+      { day:"Friday", name:"Rest", dur:"Rest", type:"rest", intervals:[] },
+      { day:"Saturday", name:"Tempo run — final push", dur:"50 min", type:"tempo", intervals:[
+          {label:"Warm-up", phase:"warmup", speed:"6.0", incline:"1.0%", time:"5 min"},
+          {label:"Tempo block", phase:"work", speed:"9.0", incline:"1.0%", time:"40 min"},
+          {label:"Cool-down", phase:"cooldown", speed:"5.0", incline:"0.0%", time:"5 min"}]},
+      { day:"Sunday", name:"LISS — celebrate walk", dur:"45 min", type:"liss", intervals:[{label:"Entire session", phase:"steady", speed:"5.5", incline:"1.5%", time:"45 min"}]},
+    ]
+  }
+};
+
+const tagMap = { hiit:["tag-hiit","HIIT"], liss:["tag-liss","LISS"], tempo:["tag-tempo","Tempo"], rest:["tag-rest","Rest"] };
+
+function showWeek(n, btn) {
+  document.querySelectorAll('.wtab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const w = weeks[n];
+  document.getElementById('week-content').innerHTML = `
+    <div class="week-desc">${w.desc}</div>
+    <div class="sessions">
+      ${w.days.map(d => {
+        const [cls, label] = tagMap[d.type];
+        const hasIntervals = d.intervals && d.intervals.length > 0;
+        return `<div class="session">
+          <div class="session-head">
+            <div>
+              <div class="s-day">${d.day}</div>
+              <div class="s-name">${d.name}</div>
+            </div>
+            <div class="s-right">
+              <span class="s-dur">${d.dur}</span>
+              <span class="s-tag ${cls}">${label}</span>
+            </div>
+          </div>
+          ${hasIntervals ? `
+          <div class="intervals">
+            <div class="interval-header">
+              <span>Phase</span><span style="text-align:center">Speed</span><span style="text-align:center">Incline</span><span style="text-align:center">Time</span>
+            </div>
+            ${d.intervals.map(iv => `
+            <div class="interval-row ${iv.phase}">
+              <span class="iv-label">${iv.label}</span>
+              <span class="spec">${iv.speed}</span>
+              <span class="spec">${iv.incline}</span>
+              <span class="spec">${iv.time}</span>
+            </div>`).join('')}
+          </div>` : ''}
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+showWeek(1, document.querySelector('.wtab'));
+
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('install-banner').style.display = 'flex';
+});
+document.getElementById('install-btn').addEventListener('click', async () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    document.getElementById('install-banner').style.display = 'none';
+  }
+});
+document.getElementById('dismiss-btn').addEventListener('click', () => {
+  document.getElementById('install-banner').style.display = 'none';
+});
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
+</script>
+</body>
+</html>
